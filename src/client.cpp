@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
         std::exit(1);
     }
     std::signal(SIGINT, signalHandler);
-    std::signal(SIGKILL, signalHandler);
+    std::signal(SIGTERM, signalHandler);
 
     MTS_RegisterMaster();
 
