@@ -1,10 +1,6 @@
 #include <iostream>
 
-#include "httplib.h"
-#include "libMTSClient.h"
-
-#include "send_tuning.h"
-#include "receive_tuning.h"
+#include "RemoteTuning.h"
 
 bool testRoundTrip()
 {

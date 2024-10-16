@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <future>
 
-#include "clap/clap.h"
-#include "httplib.h"
+#include "clap/include/clap/clap.h"
 
 #include "constants.h"
-#include "send_tuning.h"
+#include "RemoteTuning.h"
 
 struct MyPlugin
 {
@@ -30,7 +29,7 @@ static const clap_plugin_descriptor_t pluginDescriptor = {
     .manual_url = "https://github.com/narenratan",
     .support_url = "https://github.com/narenratan",
     .version = "1.0.0",
-    .description = "Send MTS-ESP tuning as json",
+    .description = "Send and receive MTS-ESP tuning as json",
     .features = _features,
 };
 
@@ -55,6 +54,7 @@ static const clap_plugin_t pluginClass = {
         MyPlugin *plugin = (MyPlugin *)_plugin->plugin_data;
         plugin->svr = new httplib::Server();
         plugin->svr->Get(ENDPOINT, sendTuning);
+        plugin->svr->Post(ENDPOINT, setTuning);
         plugin->f = std::async(std::launch::async, [&]() { plugin->svr->listen("0.0.0.0", PORT); });
         plugin->svr->wait_until_ready();
         return true;
@@ -65,6 +65,10 @@ static const clap_plugin_t pluginClass = {
             MyPlugin *plugin = (MyPlugin *)_plugin->plugin_data;
             plugin->svr->stop();
             plugin->f.get();
+            if (isMaster)
+            {
+                MTS_DeregisterMaster();
+            }
         },
 
     .start_processing = [](const clap_plugin *_plugin) -> bool { return true; },
